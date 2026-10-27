@@ -4,7 +4,7 @@
 
 body {
     margin: 0;
-    background-color: black;
+    background-color: darkslateblue;
 }
 
 .header {
@@ -12,6 +12,7 @@ body {
     color: white;
     background-color: darkblue;
     padding: 16px 0;
+    outline: 3px solid white;
 }
 
 .header h1 {
