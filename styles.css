@@ -35,9 +35,13 @@ body {
 }
 
 .kotakDalam {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     width: 98%;
     min-height: 472px;
     margin: 0 auto;
+    padding: 30px;
     border: 2px solid white;
     border-radius: 8px;
     background-color: rgb(9, 9, 43);
@@ -48,19 +52,31 @@ body {
     color: white;
 }
 
+.container-diagram {
+    display: flex;
+    flex: 2 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
 .topologi-canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 75%;
-    max-width: calc(100% - 60px);
-    min-height: 410px;
-    margin: 30px 0 30px 30px;
+    flex: none;
+    width: 100%;
+    min-height: 300px;
+    margin: 0;
     border: 2px solid white;
     border-radius: 8px;
     background-color: #060913;
     resize: both;
     overflow: hidden;
+}
+
+.container-rute-router {
+    margin-top: 16px;
+    color: white;
 }
 
 /* Mengatur ukuran <svg> di dalam .topologi-canvas */
@@ -82,7 +98,7 @@ body {
 }
 
 /* ==========================================================================
-   STYLING KABEL / LINK (EDGE)
+STYLING KABEL / LINK (EDGE)
    ========================================================================== */
 .edge {
     cursor: pointer;
@@ -157,7 +173,7 @@ body {
 }
 
 /* ==========================================================================
-   STYLING ROUTER (NODE R0 - R9)
+STYLING ROUTER (NODE R0 - R9)
    ========================================================================== */
 .node {
     cursor: pointer;
@@ -227,4 +243,46 @@ body {
 
 .node.is-off .node-cost {
     fill: #fb7185;
+}
+
+.container-pilih-router {
+    margin: 12px 0;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 80px;
+}
+
+.container-tombol-awal,
+.container-tombol-akhir {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+}
+
+.tombol{
+    background-color: rgb(6, 6, 102);
+    color: white;
+    padding : 15px 190px;
+    outline: 2px solid white;
+    border-radius: 5px;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .kotakDalam {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .container-pilih-router {
+        margin: 0;
+    }
+
+    .tombol {
+        padding: 10px 12px;
+    }
 }

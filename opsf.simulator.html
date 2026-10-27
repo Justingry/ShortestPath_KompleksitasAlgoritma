@@ -18,9 +18,10 @@
                 <section class="kotak">
                     <section class="kotakDalam">
 
+                    <section class="container-diagram">
                         <section class="topologi-canvas">
                             <!-- WAJIB ADA TAG <svg> AGAR GARIS & LINGKARAN ROUTER DIGAMBAR OLEH BROWSER -->
-                            <svg id="ospf-topology" viewBox="0 0 1050 430" xmlns="http://www.w3.org/2000/svg">
+                            <svg id="ospf-topology" viewBox="0 0 1050 430">
                                     <defs>
                                         <pattern id="ospf-grid" width="35" height="35" patternUnits="userSpaceOnUse">
                                             <path class="grid-line" d="M 35 0 L 0 0 0 35" />
@@ -127,8 +128,8 @@
                                         <a href="#toggle-edge-13" id="edge-13" class="edge is-path" data-id="13" data-u="8" data-v="9" data-bw="100" data-cost="1">
                                             <line class="edge-hit" x1="975" y1="80" x2="975" y2="365" />
                                             <line class="edge-line" x1="975" y1="80" x2="975" y2="365" />
-                                            <rect class="edge-badge" x="916" y="210.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="975" y="226.5">100 Mbps, Cost = 1</text>
+                                            <rect class="edge-badge" x="916" y="250.5" width="118" height="24" rx="6" />
+                                            <text class="edge-label" x="975" y="266.5">100 Mbps, Cost = 1</text>
                                         </a>
                                     </g>
                                 
@@ -196,16 +197,63 @@
                                         </a>
                                     </g>
                                 </svg>
+                            </section>
+                            <section class="container-rute-router">
+                                Rute Router
+                                <section class="container-rute-router-tombol">
+                                    <button> R0 </button>
+                                    <button> R1 </button>
+                                    <button> R2 </button>
+                                    <button> R3 </button>
+                                    <button> R4 </button>
+                                </section>
+                                <section class="container-rute-router-tombol">
+                                    <button> R5 </button>
+                                    <button> R6 </button>
+                                    <button> R7 </button>
+                                    <button> R8 </button>
+                                    <button> R9 </button>
+                                </section>
+                            </section>
                         </section>
 
-                    </section>
+                        <section class="container-pilih-router">
+                            <section class="container-tombol-awal">
+                                <label for="tombol">Awal</label>
+                                <select id="tombol" class="tombol">
+                                    <option value="R0">R0</option>
+                                    <option value="R1">R1</option>
+                                    <option value="R2">R2</option>
+                                    <option value="R3">R3</option>
+                                    <option value="R4">R4</option>
+                                    <option value="R5">R5</option>
+                                    <option value="R6">R6</option>
+                                    <option value="R7">R7</option>
+                                    <option value="R8">R8</option>
+                                    <option value="R9">R9</option>
+                                </select>
+                            </section>
+
+                            <section class="container-tombol-akhir">
+                                <label for="tombol-akhir">Akhir</label>
+                                <select id="tombol-akhir" class="tombol">
+                                    <option value="R0">R0</option>
+                                    <option value="R1">R1</option>
+                                    <option value="R2">R2</option>
+                                    <option value="R3">R3</option>
+                                    <option value="R4">R4</option>
+                                    <option value="R5">R5</option>
+                                    <option value="R6">R6</option>
+                                    <option value="R7">R7</option>
+                                    <option value="R8">R8</option>
+                                    <option value="R9">R9</option>
+                                </select>
+                            </section>
+                        </section>
+
                 </section>
             </main>
         </div>
-
-        <footer class="footer">
-            <p>&copy; kelompok 2 kompleksitas algoritma.</p>
-        </footer>
 
         <!-- Memanggil logika OSPF Dijkstra -->
         <script src="script.js"></script>
