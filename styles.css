@@ -1,20 +1,44 @@
 *{
     font-family: Arial, sans-serif;
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background-color: darkslateblue;
+    background-color:rgb(9, 9, 43);
 }
 
 .header {
     text-align: center;
     color: white;
-    background-color: darkblue;
+    background-color: rgb(6, 6, 102);
     padding: 16px 0;
     outline: 3px solid white;
 }
 
 .header h1 {
     margin: 0;
+}
+
+.container {
+    color: white;
+    text-align: center;
+}
+
+.kotak {
+    width: 95%;
+    min-height: 500px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: rgb(6, 6, 102);
+    border-radius: 10px;
+}
+
+.kotakDalam {
+    width: 98%;
+    min-height: 500px;
+    margin: 0 auto;
+    border: 2px solid white;
+    border-radius: 8px;
+    background-color: rgb(9, 9, 43);
 }
