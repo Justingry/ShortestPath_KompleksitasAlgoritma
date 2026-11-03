@@ -1,243 +1,335 @@
+/**
+ * ============================================================================
+ * PROGRAM SIMULASI SHORTEST PATH OSPF (DIJKSTRA MIN-HEAP) DALAM BAHASA C++
+ * ============================================================================
+ * Tugas Mata Kuliah : Kompleksitas Algoritma
+ * Topik             : Pencarian Jalur Terpendek (Shortest Path) Metode OSPF
+ * Topologi          : 10 Router (R0 - R9) dan 14 Link (sesuai gambar topologi)
+ *
+ * KEUNGGULAN VERSI C++ (DIBANDINGKAN C MURNI):
+ * 1. Menggunakan STL `std::priority_queue` (Binary Min-Heap) & `std::vector`
+ *    (Adjacency List) sehingga Kompleksitas Waktu meningkat menjadi
+ *    O((V + E) log V), jauh lebih efisien daripada Adjacency Matrix O(V^2)!
+ * 2. Struktur kode berbasis Object-Oriented Programming (`class OSPFNetwork`)
+ *    yang bersih, modern, dan sangat mudah diintegrasikan ke WebAssembly (Wasm)
+ *    menggunakan Emscripten `EMSCRIPTEN_BINDINGS` atau CGI Backend.
+ *
+ * CARA KOMPILASI & MENJALANKAN DI TERMINAL:
+ *   g++ -std=c++17 ospf_shortest_path.cpp -o ospf_cpp
+ *   ./ospf_cpp
+ * ============================================================================
+ */
+
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <iomanip>
 #include <string>
 #include <algorithm>
-#include <iomanip>
 
 using namespace std;
 
-const int INF = 1e9;
-const int REF_BANDWIDTH = 100; // Standar Default Cisco Packet Tracer: 100 Mbps (FastEthernet)
+const int INF = 999999;
+const int REF_BANDWIDTH = 100; // Reference Bandwidth standar FastEthernet = 100 Mbps
 
-struct Kabel {
-    int tujuan;
-    int bandwidth; // dalam Mbps
-    int cost;      // OSPF Cost = 100 / bandwidth
+// Struktur data untuk menyimpan informasi Link (Kabel antar Router)
+struct Edge {
+    int id;
+    int u;              // Router asal
+    int v;              // Router tujuan
+    int bandwidth_mbps; // Bandwidth dalam Mbps
+    int cost;           // OSPF Cost = 100 / bandwidth_mbps
+    bool active;        // Status link: true = UP (Aktif), false = DOWN (Mati)
 };
 
-void tambahKabel(vector<vector<Kabel>>& adj, int u, int v, int bandwidth) {
-    int cost = REF_BANDWIDTH / bandwidth;
-    if (cost < 1) cost = 1; // Minimal OSPF cost di Cisco adalah 1
+// Kelas Utama Jaringan OSPF
+class OSPFNetwork {
+private:
+    int num_nodes;
+    vector<bool> node_active;
+    vector<Edge> edges;
 
-    adj[u].push_back({v, bandwidth, cost});
-    adj[v].push_back({u, bandwidth, cost});
-}
+public:
+    int op_heap_pushes = 0;
+    int op_heap_pops = 0;
+    int op_neighbor_checks = 0;
+    int op_relaxations = 0;
 
-void cetakJalur(int awal, int tujuan, const vector<int>& parent, const vector<string>& namaRouter) {
-    vector<int> rute;
-    int sekarang = tujuan;
-
-    while (sekarang != -1) {
-        rute.push_back(sekarang);
-        sekarang = parent[sekarang];
+    OSPFNetwork() : num_nodes(10), node_active(10, true) {
+        // Inisialisasi 14 Link sesuai gambar topologi R0 - R9
+        edges = {
+            {0,  0, 1, 10,  10, true}, // R0 - R1 : 10 Mbps,  Cost = 10
+            {1,  0, 2, 50,  2,  true}, // R0 - R2 : 50 Mbps,  Cost = 2
+            {2,  1, 2, 25,  4,  true}, // R1 - R2 : 25 Mbps,  Cost = 4
+            {3,  1, 3, 50,  2,  true}, // R1 - R3 : 50 Mbps,  Cost = 2
+            {4,  2, 3, 10,  10, true}, // R2 - R3 : 10 Mbps,  Cost = 10
+            {5,  3, 4, 100, 1,  true}, // R3 - R4 : 100 Mbps, Cost = 1
+            {6,  3, 5, 25,  4,  true}, // R3 - R5 : 25 Mbps,  Cost = 4
+            {7,  4, 6, 100, 1,  true}, // R4 - R6 : 100 Mbps, Cost = 1
+            {8,  5, 6, 25,  4,  true}, // R5 - R6 : 25 Mbps,  Cost = 4
+            {9,  5, 7, 50,  2,  true}, // R5 - R7 : 50 Mbps,  Cost = 2
+            {10, 6, 8, 50,  2,  true}, // R6 - R8 : 50 Mbps,  Cost = 2
+            {11, 7, 8, 25,  4,  true}, // R7 - R8 : 25 Mbps,  Cost = 4
+            {12, 7, 9, 20,  5,  true}, // R7 - R9 : 20 Mbps,  Cost = 5
+            {13, 8, 9, 100, 1,  true}  // R8 - R9 : 100 Mbps, Cost = 1
+        };
     }
 
-    reverse(rute.begin(), rute.end());
-
-    for (size_t i = 0; i < rute.size(); i++) {
-        cout << "R" << rute[i] << " (" << namaRouter[rute[i]] << ")";
-        if (i + 1 < rute.size()) cout << " -> ";
-    }
-}
-
-// DFS: kumpulkan semua jalur sederhana (tanpa router berulang) dari sekarang ke akhir
-static void cariSemuaJalur(int sekarang, int akhir, const vector<vector<Kabel>>& adj,
-                           vector<bool>& dikunjungi, vector<int>& jalan, int costJalan,
-                           vector<pair<int, vector<int>>>& hasil) {
-    if (sekarang == akhir) {
-        hasil.push_back({costJalan, jalan});
-        return;
-    }
-    for (const auto& k : adj[sekarang]) {
-        if (dikunjungi[k.tujuan]) continue;
-        dikunjungi[k.tujuan] = true;
-        jalan.push_back(k.tujuan);
-        cariSemuaJalur(k.tujuan, akhir, adj, dikunjungi, jalan, costJalan + k.cost, hasil);
-        jalan.pop_back();
-        dikunjungi[k.tujuan] = false;
-    }
-}
-
-// Menampilkan jalur tercepat dari router awal ke router akhir, beserta semua jalur alternatif
-void tampilkanJalurTercepat(int awal, int akhir, int n, const vector<int>& totalCost,
-                            const vector<int>& parent, const vector<vector<Kabel>>& adj,
-                            const vector<string>& namaRouter) {
-    cout << "\n=========================================================\n";
-    cout << "JALUR TERCEPAT: R" << awal << " (" << namaRouter[awal] << ") -> R"
-         << akhir << " (" << namaRouter[akhir] << ")\n";
-    cout << "=========================================================\n";
-
-    if (totalCost[akhir] == INF) {
-        cout << "Status    : Jaringan Terputus (Unreachable)\n";
-        return;
-    }
-
-    // Semua jalur yang mungkin dari awal ke akhir, urut dari cost terkecil
-    vector<pair<int, vector<int>>> semuaJalur;
-    vector<bool> dikunjungi(n, false);
-    vector<int> jalan = {awal};
-    dikunjungi[awal] = true;
-    cariSemuaJalur(awal, akhir, adj, dikunjungi, jalan, 0, semuaJalur);
-    sort(semuaJalur.begin(), semuaJalur.end());
-
-    cout << "Ditemukan " << semuaJalur.size() << " kemungkinan jalur (urut dari tercepat):\n\n";
-    cout << left << setw(6) << "No" << setw(8) << "Cost" << "Rute\n";
-    cout << string(75, '-') << "\n";
-
-    for (size_t k = 0; k < semuaJalur.size(); k++) {
-        cout << left << setw(6) << (k + 1) << setw(8) << semuaJalur[k].first;
-        const vector<int>& r = semuaJalur[k].second;
-        for (size_t i = 0; i < r.size(); i++) {
-            cout << "R" << r[i];
-            if (i + 1 < r.size()) cout << " -> ";
+    void toggleNode(int r) {
+        if (r >= 0 && r < num_nodes) {
+            node_active[r] = !node_active[r];
+            cout << "[INFO] Status Router R" << r << " sekarang: "
+                 << (node_active[r] ? "ON (Aktif)" : "OFF (Mati)") << "\n";
         }
-        if (semuaJalur[k].first == totalCost[akhir]) cout << "   << TERCEPAT";
-        cout << "\n";
     }
-}
 
-void bangunTabelOSPF(int start, int akhir, int n, const vector<vector<Kabel>>& adj, const vector<string>& namaRouter) {
-    vector<int> totalCost(n, INF);
-    vector<int> parent(n, -1);
+    void setNodeStatus(int r, bool status) {
+        if (r >= 0 && r < num_nodes) node_active[r] = status;
+    }
 
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    void toggleEdge(int e) {
+        if (e >= 0 && e < (int)edges.size()) {
+            edges[e].active = !edges[e].active;
+            cout << "[INFO] Status Link R" << edges[e].u << "-R" << edges[e].v
+                 << " sekarang: " << (edges[e].active ? "UP (Aktif)" : "DOWN (Mati)") << "\n";
+        }
+    }
 
-    totalCost[start] = 0;
-    pq.push({0, start});
+    void setEdgeStatus(int e, bool status) {
+        if (e >= 0 && e < (int)edges.size()) edges[e].active = status;
+    }
 
-    while (!pq.empty()) {
-        int costSekarang = pq.top().first;
-        int u = pq.top().second;
-        pq.pop();
+    void resetAll() {
+        fill(node_active.begin(), node_active.end(), true);
+        for (auto &edge : edges) edge.active = true;
+    }
 
-        if (costSekarang > totalCost[u]) continue;
+    // Rekonstruksi string jalur dari src ke target
+    string formatPath(const vector<int> &parent, int target) const {
+        vector<int> path;
+        for (int v = target; v != -1; v = parent[v]) {
+            path.push_back(v);
+        }
+        reverse(path.begin(), path.end());
+        string s;
+        for (size_t i = 0; i < path.size(); i++) {
+            s += "R" + to_string(path[i]);
+            if (i + 1 < path.size()) s += " -> ";
+        }
+        return s;
+    }
 
-        for (const auto& kabel : adj[u]) {
-            int v = kabel.tujuan;
-            int costKabel = kabel.cost;
+    // Menentukan Next-Hop pertama dari src menuju dest
+    int getNextHop(const vector<int> &parent, int src, int dest) const {
+        if (dest == src || parent[dest] == -1) return -1;
+        int curr = dest;
+        while (parent[curr] != -1 && parent[curr] != src) {
+            curr = parent[curr];
+        }
+        return curr;
+    }
 
-            if (totalCost[u] + costKabel < totalCost[v]) {
-                totalCost[v] = totalCost[u] + costKabel;
-                parent[v] = u;
-                pq.push({totalCost[v], v});
+    /**
+     * ALGORITMA DIJKSTRA MENGGUNAKAN STL PRIORITY QUEUE (MIN-HEAP) & ADJACENCY LIST
+     * Kompleksitas Waktu : O((V + E) log V)
+     * Kompleksitas Ruang : O(V + E)
+     */
+    void runDijkstra(int src, int dst, bool verbose = true) {
+        op_heap_pushes = 0;
+        op_heap_pops = 0;
+        op_neighbor_checks = 0;
+        op_relaxations = 0;
+
+        // 1. Bangun Adjacency List dinamis: adj[u] berisi pasangan (tetangga v, cost)
+        vector<vector<pair<int, int>>> adj(num_nodes);
+        for (const auto &edge : edges) {
+            if (edge.active && node_active[edge.u] && node_active[edge.v]) {
+                adj[edge.u].push_back({edge.v, edge.cost});
+                adj[edge.v].push_back({edge.u, edge.cost});
             }
         }
-    }
 
-    cout << "\n=========================================================\n";
-    cout << "TABEL ROUTING OSPF DARI R" << start << " (" << namaRouter[start] << ")\n";
-    cout << "Reference Bandwidth: " << REF_BANDWIDTH << " Mbps (Standar Cisco Packet Tracer)\n";
-    cout << "=========================================================\n";
+        vector<int> dist(num_nodes, INF);
+        vector<int> parent(num_nodes, -1);
+        vector<bool> visited(num_nodes, false);
 
-    for (int i = 0; i < n; i++) {
-        if (i == start) continue;
+        if (!node_active[src]) {
+            cout << "\n[PERINGATAN] Router asal R" << src << " sedang MATI (OFF)!\n";
+            return;
+        }
 
-        cout << "\nTujuan    : R" << i << " (" << namaRouter[i] << ")\n";
-        if (totalCost[i] == INF) {
-            cout << "Status    : Jaringan Terputus (Unreachable)\n";
+        // Min-Heap menyimpan pasangan: (cost_saat_ini, id_router)
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+
+        dist[src] = 0;
+        pq.push({0, src});
+        op_heap_pushes++;
+
+        if (verbose) {
+            cout << "\n========================================================================\n";
+            cout << " EKSEKUSI DIJKSTRA C++ DENGAN STL PRIORITY_QUEUE (MIN-HEAP O((V+E)logV))\n";
+            cout << "========================================================================\n";
+        }
+
+        int iteration = 0;
+        while (!pq.empty()) {
+            auto [d, u] = pq.top();
+            pq.pop();
+            op_heap_pops++;
+
+            // Abaikan entri usang di dalam Min-Heap jika node sudah dikunjungi
+            if (visited[u]) continue;
+            visited[u] = true;
+            iteration++;
+
+            if (verbose) {
+                cout << "Iterasi " << iteration << " [Pop Min-Heap]: Router R" << u
+                     << " (Total Cost = " << d << ")\n";
+            }
+
+            // Hanya periksa tetangga yang benar-benar terhubung di Adjacency List!
+            for (const auto &[v, weight] : adj[u]) {
+                op_neighbor_checks++;
+                if (!visited[v] && d + weight < dist[v]) {
+                    int old_cost = dist[v];
+                    dist[v] = d + weight;
+                    parent[v] = u;
+                    pq.push({dist[v], v});
+                    op_heap_pushes++;
+                    op_relaxations++;
+
+                    if (verbose) {
+                        cout << "   -> Relaksasi R" << v << " via R" << u
+                             << " : Cost baru = " << dist[v] << " (sebelumnya "
+                             << (old_cost == INF ? "INF" : to_string(old_cost))
+                             << ") -> Push ke Min-Heap\n";
+                    }
+                }
+            }
+        }
+
+        // Cetak Hasil Rute Terpendek
+        cout << "\n========================================================================\n";
+        cout << " HASIL JALUR TERPENDEK (OSPF SHORTEST PATH): R" << src << " menuju R" << dst << "\n";
+        cout << "========================================================================\n";
+        if (!node_active[dst] || dist[dst] == INF) {
+            cout << "Status       : TIDAK TERJANGKAU (Unreachable / Jaringan Terputus)\n";
         } else {
-            cout << "Total Cost: " << totalCost[i] << "\n";
-            cout << "Rute SPF  : ";
-            cetakJalur(start, i, parent, namaRouter);
-            cout << "\n";
+            cout << "Status       : TERHUBUNG (Optimal OSPF Route Ditemukan)\n";
+            cout << "Rute Terbaik : " << formatPath(parent, dst) << "\n";
+            cout << "Total Cost   : " << dist[dst] << "\n";
         }
-    }
 
-    // Menampilkan jalur tercepat dari router awal (start) ke router tujuan pilihan (akhir)
-    tampilkanJalurTercepat(start, akhir, n, totalCost, parent, adj, namaRouter);
-}
+        // Cetak Tabel Routing OSPF
+        cout << "\n------------------------------------------------------------------------\n";
+        cout << " TABEL ROUTING OSPF PADA ROUTER R" << src << " (C++ STL Implementation)\n";
+        cout << "------------------------------------------------------------------------\n";
+        cout << left << setw(10) << "Tujuan" << " | "
+             << setw(12) << "Status" << " | "
+             << setw(10) << "Total Cost" << " | "
+             << "Next-Hop & Jalur Lengkap\n";
+        cout << "------------------------------------------------------------------------\n";
 
-int main() {
-    cout << "=========================================================\n";
-    cout << "        SIMULASI ROUTING OSPF DINAMIS (INPUT/OUTPUT)     \n";
-    cout << "=========================================================\n";
-
-    int jumlahRouter;
-    cout << "Masukkan jumlah router (minimal 2): ";
-    while (!(cin >> jumlahRouter) || jumlahRouter < 2) {
-        cout << "Input tidak valid! Masukkan jumlah router (minimal 2): ";
-        cin.clear();
-        cin.ignore(10000, '\n');
-    }
-
-    vector<string> namaRouter(jumlahRouter);
-    char kustomNama;
-    cout << "Apakah ingin menginput nama khusus untuk setiap router? (y/n): ";
-    cin >> kustomNama;
-
-    if (kustomNama == 'y' || kustomNama == 'Y') {
-        for (int i = 0; i < jumlahRouter; i++) {
-            cout << "Masukkan nama untuk R" << i << ": ";
-            getline(cin >> ws, namaRouter[i]);
-        }
-    } else {
-        for (int i = 0; i < jumlahRouter; i++) {
-            namaRouter[i] = "Router " + to_string(i);
-        }
-    }
-
-    vector<vector<Kabel>> adj(jumlahRouter);
-
-    int jumlahKabel;
-    cout << "\nMasukkan jumlah koneksi kabel: ";
-    while (!(cin >> jumlahKabel) || jumlahKabel < 0) {
-        cout << "Input tidak valid! Masukkan jumlah koneksi kabel (minimal 0): ";
-        cin.clear();
-        cin.ignore(10000, '\n');
-    }
-
-    cout << "\n--- Input Data Koneksi Kabel ---\n";
-    cout << "Format: [Router_Asal] [Router_Tujuan] [Bandwidth_Mbps]\n";
-    cout << "Contoh: 0 1 10 (artinya R0 terhubung ke R1 dengan bandwidth 10 Mbps)\n\n";
-
-    for (int i = 0; i < jumlahKabel; i++) {
-        int u, v, bw;
-        while (true) {
-            cout << "Kabel ke-" << (i + 1) << " (u v bandwidth): ";
-            if (cin >> u >> v >> bw &&
-                u >= 0 && u < jumlahRouter &&
-                v >= 0 && v < jumlahRouter &&
-                u != v && bw > 0) {
-                tambahKabel(adj, u, v, bw);
-                break;
+        for (int i = 0; i < num_nodes; i++) {
+            cout << left << setw(10) << ("R" + to_string(i)) << " | ";
+            if (i == src) {
+                cout << setw(12) << "ONLINE" << " | "
+                     << setw(10) << 0 << " | Local (Router Asal)\n";
+            } else if (!node_active[i]) {
+                cout << setw(12) << "NODE DOWN" << " | "
+                     << setw(10) << "INF" << " | -\n";
+            } else if (dist[i] == INF) {
+                cout << setw(12) << "UNREACHABLE" << " | "
+                     << setw(10) << "INF" << " | Jalur Terputus\n";
             } else {
-                cout << "  [!] Input tidak valid! Pastikan nomor router antara 0 s.d. "
-                     << (jumlahRouter - 1) << ", router asal != tujuan, dan bandwidth > 0.\n";
-                cin.clear();
-                cin.ignore(10000, '\n');
+                int nh = getNextHop(parent, src, i);
+                cout << setw(12) << "REACHABLE" << " | "
+                     << setw(10) << dist[i] << " | via R" << nh
+                     << " (" << formatPath(parent, i) << ")\n";
             }
         }
+
+        // Cetak Analisis Kompleksitas Algoritma (Perbandingan C++ Min-Heap vs C Matriks)
+        cout << "------------------------------------------------------------------------\n";
+        cout << " ANALISIS KOMPLEKSITAS ALGORITMA (C++ ADJACENCY LIST + MIN-HEAP)\n";
+        cout << "------------------------------------------------------------------------\n";
+        cout << "Jumlah Node (V) & Link (E)       : V = " << num_nodes << ", E = " << edges.size() << "\n";
+        cout << "Operasi Cek Tetangga Aktual      : " << op_neighbor_checks << " kali (vs 214 di Matriks C)\n";
+        cout << "Operasi Push / Pop Min-Heap      : " << op_heap_pushes << " push, " << op_heap_pops << " pop\n";
+        cout << "Operasi Relaksasi (Update Cost)  : " << op_relaxations << " kali\n";
+        cout << "Kompleksitas Waktu C++ (Min-Heap): O((V + E) log2 V) = ~79 operasi\n";
+        cout << "Kompleksitas Ruang C++ (Adj List): O(V + E) (Hemat memori untuk graf jarang)\n";
+        cout << "========================================================================\n";
     }
 
-    char ulangi = 'y';
-    while (ulangi == 'y' || ulangi == 'Y') {
-        int routerAwal, routerAkhir;
-
-        cout << "\n--- Pilih Router Awal dan Tujuan ---\n";
-        while (true) {
-            cout << "Masukkan nomor Router Awal (0 s.d. " << (jumlahRouter - 1) << ")  : ";
-            if (cin >> routerAwal && routerAwal >= 0 && routerAwal < jumlahRouter) break;
-            cout << "  [!] Nomor router tidak valid!\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+    void printTopologyStatus() const {
+        cout << "\n--- STATUS ROUTER (NODE) ---\n";
+        for (int i = 0; i < num_nodes; i++) {
+            cout << "R" << i << ": [" << (node_active[i] ? "ON " : "OFF") << "]   ";
+            if (i == 4 || i == 9) cout << "\n";
         }
-
-        while (true) {
-            cout << "Masukkan nomor Router Tujuan (0 s.d. " << (jumlahRouter - 1) << "): ";
-            if (cin >> routerAkhir && routerAkhir >= 0 && routerAkhir < jumlahRouter) break;
-            cout << "  [!] Nomor router tidak valid!\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+        cout << "\n--- STATUS KABEL / LINK (EDGE) ---\n";
+        for (const auto &e : edges) {
+            cout << "ID " << setw(2) << e.id << " | R" << e.u << " <-> R" << e.v
+                 << " | " << setw(3) << e.bandwidth_mbps << " Mbps (Cost=" << setw(2) << e.cost << ") | "
+                 << (e.active ? "UP (Aktif)" : "DOWN (Mati)") << "\n";
         }
+    }
+};
 
-        // Eksekusi perhitungan dan tampilkan output
-        bangunTabelOSPF(routerAwal, routerAkhir, jumlahRouter, adj, namaRouter);
+int main(int argc, char *argv[]) {
+    OSPFNetwork net;
 
-        cout << "\nApakah ingin mengecek rute untuk Router Awal/Tujuan lain? (y/n): ";
-        cin >> ulangi;
+    if (argc > 1 && string(argv[1]) == "--demo") {
+        cout << ">>> SKENARIO 1: KONDISI NORMAL (SEMUA ROUTER & LINK AKTIF) <<<\n";
+        net.runDijkstra(0, 9, true);
+
+        cout << "\n>>> SKENARIO 2: LINK ATAS R4-R6 PUTUS (FAILOVER OTOMATIS) <<<\n";
+        net.setEdgeStatus(7, false); // Matikan Link R4 - R6
+        net.runDijkstra(0, 9, true);
+        return 0;
     }
 
-    cout << "\nProgram selesai. Terima kasih!\n";
+    int src = 0, dst = 9, choice;
+    while (true) {
+        cout << "\n======================================================\n";
+        cout << "  MENU SIMULATOR OSPF SHORTEST PATH (BAHASA C++ STL)\n";
+        cout << "======================================================\n";
+        cout << "1. Hitung Jalur Terpendek (R" << src << " -> R" << dst << ") & Tabel Routing\n";
+        cout << "2. Ubah Router Asal (Source) & Tujuan (Destination)\n";
+        cout << "3. Lihat Status Topologi (Router & Link)\n";
+        cout << "4. Matikan / Nyalakan Router (Toggle Node R0 - R9)\n";
+        cout << "5. Matikan / Nyalakan Link Kabel (Toggle Edge 0 - 13)\n";
+        cout << "6. Reset Semua Topologi ke Kondisi Normal (Semua ON)\n";
+        cout << "0. Keluar\n";
+        cout << "Pilihan Anda: ";
+
+        if (!(cin >> choice) || choice == 0) break;
+
+        if (choice == 1) {
+            net.runDijkstra(src, dst, true);
+        } else if (choice == 2) {
+            cout << "Masukkan ID Router Asal (0-9): "; cin >> src;
+            cout << "Masukkan ID Router Tujuan (0-9): "; cin >> dst;
+            net.runDijkstra(src, dst, true);
+        } else if (choice == 3) {
+            net.printTopologyStatus();
+        } else if (choice == 4) {
+            int r;
+            net.printTopologyStatus();
+            cout << "Masukkan nomor Router yang ingin di-toggle (0-9): "; cin >> r;
+            net.toggleNode(r);
+            net.runDijkstra(src, dst, false);
+        } else if (choice == 5) {
+            int e;
+            net.printTopologyStatus();
+            cout << "Masukkan ID Link yang ingin di-toggle (0-13): "; cin >> e;
+            net.toggleEdge(e);
+            net.runDijkstra(src, dst, false);
+        } else if (choice == 6) {
+            net.resetAll();
+            net.runDijkstra(src, dst, false);
+        }
+    }
     return 0;
 }
