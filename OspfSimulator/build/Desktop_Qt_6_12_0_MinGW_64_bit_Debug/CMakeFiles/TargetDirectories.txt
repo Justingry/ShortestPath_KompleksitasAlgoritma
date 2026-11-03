@@ -1,0 +1,5 @@
+C:/Users/user/OneDrive/Dokumen/Folder Mahasiswa 2510511175/SEMESTER 3/Kompleksitas Algoritma/OspfSimulator/build/Desktop_Qt_6_12_0_MinGW_64_bit_Debug/CMakeFiles/OspfSimulator.dir
+C:/Users/user/OneDrive/Dokumen/Folder Mahasiswa 2510511175/SEMESTER 3/Kompleksitas Algoritma/OspfSimulator/build/Desktop_Qt_6_12_0_MinGW_64_bit_Debug/CMakeFiles/edit_cache.dir
+C:/Users/user/OneDrive/Dokumen/Folder Mahasiswa 2510511175/SEMESTER 3/Kompleksitas Algoritma/OspfSimulator/build/Desktop_Qt_6_12_0_MinGW_64_bit_Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/user/OneDrive/Dokumen/Folder Mahasiswa 2510511175/SEMESTER 3/Kompleksitas Algoritma/OspfSimulator/build/Desktop_Qt_6_12_0_MinGW_64_bit_Debug/CMakeFiles/OspfSimulator_autogen_timestamp_deps.dir
+C:/Users/user/OneDrive/Dokumen/Folder Mahasiswa 2510511175/SEMESTER 3/Kompleksitas Algoritma/OspfSimulator/build/Desktop_Qt_6_12_0_MinGW_64_bit_Debug/CMakeFiles/OspfSimulator_autogen.dir
