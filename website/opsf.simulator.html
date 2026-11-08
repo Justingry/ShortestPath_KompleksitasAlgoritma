@@ -21,7 +21,7 @@
                     <section class="container-diagram">
                         <section class="topologi-canvas">
                             <!-- WAJIB ADA TAG <svg> AGAR GARIS & LINGKARAN ROUTER DIGAMBAR OLEH BROWSER -->
-                            <svg id="ospf-topology" viewBox="0 0 1050 430">
+                            <svg id="ospf-topology" viewBox="0 0 1050 520">
                                     <defs>
                                         <pattern id="ospf-grid" width="35" height="35" patternUnits="userSpaceOnUse">
                                             <path class="grid-line" d="M 35 0 L 0 0 0 35" />
@@ -29,171 +29,259 @@
                                     </defs>
                                 
                                     <!-- Latar Grid Kanvas -->
-                                    <rect class="canvas-bg" width="1050" height="430" />
+                                    <rect class="canvas-bg" width="1050" height="520" />
                                 
-                                    <!-- LAYER 1: DAFTAR 14 KABEL / LINK (EDGES) -->
+                                    <!-- LAYER 1: DAFTAR 24 KABEL / LINK (EDGES) -->
                                     <g id="edges-layer">
-                                        <!-- Link 0: R0 <-> R1 (10 Mbps, Cost = 10) -->
-                                        <a href="#toggle-edge-0" id="edge-0" class="edge" data-id="0" data-u="0" data-v="1" data-bw="10" data-cost="10">
-                                            <line class="edge-hit" x1="65" y1="230" x2="225" y2="75" />
-                                            <line class="edge-line" x1="65" y1="230" x2="225" y2="75" />
-                                            <rect class="edge-badge" x="86" y="140.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="145" y="156.5">10 Mbps, Cost = 10</text>
+                                        <!-- Link 0: Node 1 <-> Node 2 (Cost = 700) -->
+                                        <a href="#toggle-edge-0" id="edge-0" class="edge" data-id="0" data-u="1" data-v="2" data-cost="700">
+                                            <line class="edge-hit" x1="170" y1="465" x2="75" y2="195" />
+                                            <line class="edge-line" x1="170" y1="465" x2="75" y2="195" />
+                                            <rect class="edge-badge" x="94.5" y="319" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="122.5" y="334">700</text>
                                         </a>
-                                        <!-- Link 1: R0 <-> R2 (50 Mbps, Cost = 2) -->
-                                        <a href="#toggle-edge-1" id="edge-1" class="edge is-path" data-id="1" data-u="0" data-v="2" data-bw="50" data-cost="2">
-                                            <line class="edge-hit" x1="65" y1="230" x2="225" y2="365" />
-                                            <line class="edge-line" x1="65" y1="230" x2="225" y2="365" />
-                                            <rect class="edge-badge" x="86" y="285.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="145" y="301.5">50 Mbps, Cost = 2</text>
+                                        <!-- Link 1: Node 1 <-> Node 4 (Cost = 400) -->
+                                        <a href="#toggle-edge-1" id="edge-1" class="edge is-path" data-id="1" data-u="1" data-v="4" data-cost="400">
+                                            <line class="edge-hit" x1="170" y1="465" x2="260" y2="335" />
+                                            <line class="edge-line" x1="170" y1="465" x2="260" y2="335" />
+                                            <rect class="edge-badge" x="187" y="389" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="215" y="404">400</text>
                                         </a>
-                                        <!-- Link 2: R1 <-> R2 (25 Mbps, Cost = 4) -->
-                                        <a href="#toggle-edge-2" id="edge-2" class="edge is-path" data-id="2" data-u="1" data-v="2" data-bw="25" data-cost="4">
-                                            <line class="edge-hit" x1="225" y1="75" x2="225" y2="365" />
-                                            <line class="edge-line" x1="225" y1="75" x2="225" y2="365" />
-                                            <rect class="edge-badge" x="166" y="208" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="225" y="224">25 Mbps, Cost = 4</text>
+                                        <!-- Link 2: Node 1 <-> Node 7 (Cost = 900) -->
+                                        <a href="#toggle-edge-2" id="edge-2" class="edge" data-id="2" data-u="1" data-v="7" data-cost="900">
+                                            <line class="edge-hit" x1="170" y1="465" x2="680" y2="465" />
+                                            <line class="edge-line" x1="170" y1="465" x2="680" y2="465" />
+                                            <rect class="edge-badge" x="397" y="454" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="425" y="469">900</text>
                                         </a>
-                                        <!-- Link 3: R1 <-> R3 (50 Mbps, Cost = 2) -->
-                                        <a href="#toggle-edge-3" id="edge-3" class="edge is-path" data-id="3" data-u="1" data-v="3" data-bw="50" data-cost="2">
-                                            <line class="edge-hit" x1="225" y1="75" x2="415" y2="230" />
-                                            <line class="edge-line" x1="225" y1="75" x2="415" y2="230" />
-                                            <rect class="edge-badge" x="261" y="140.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="320" y="156.5">50 Mbps, Cost = 2</text>
+                                        <!-- Link 3: Node 2 <-> Node 3 (Cost = 300) -->
+                                        <a href="#toggle-edge-3" id="edge-3" class="edge" data-id="3" data-u="2" data-v="3" data-cost="300">
+                                            <line class="edge-hit" x1="75" y1="195" x2="250" y2="65" />
+                                            <line class="edge-line" x1="75" y1="195" x2="250" y2="65" />
+                                            <rect class="edge-badge" x="134.5" y="119" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="162.5" y="134">300</text>
                                         </a>
-                                        <!-- Link 4: R2 <-> R3 (10 Mbps, Cost = 10) -->
-                                        <a href="#toggle-edge-4" id="edge-4" class="edge" data-id="4" data-u="2" data-v="3" data-bw="10" data-cost="10">
-                                            <line class="edge-hit" x1="225" y1="365" x2="415" y2="230" />
-                                            <line class="edge-line" x1="225" y1="365" x2="415" y2="230" />
-                                            <rect class="edge-badge" x="261" y="285.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="320" y="301.5">10 Mbps, Cost = 10</text>
+                                        <!-- Link 4: Node 2 <-> Node 4 (Cost = 400) -->
+                                        <a href="#toggle-edge-4" id="edge-4" class="edge" data-id="4" data-u="2" data-v="4" data-cost="400">
+                                            <line class="edge-hit" x1="75" y1="195" x2="260" y2="335" />
+                                            <line class="edge-line" x1="75" y1="195" x2="260" y2="335" />
+                                            <rect class="edge-badge" x="139.5" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="167.5" y="269">400</text>
                                         </a>
-                                        <!-- Link 5: R3 <-> R4 (100 Mbps, Cost = 1) -->
-                                        <a href="#toggle-edge-5" id="edge-5" class="edge is-path" data-id="5" data-u="3" data-v="4" data-bw="100" data-cost="1">
-                                            <line class="edge-hit" x1="415" y1="230" x2="600" y2="80" />
-                                            <line class="edge-line" x1="415" y1="230" x2="600" y2="80" />
-                                            <rect class="edge-badge" x="448.5" y="143" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="507.5" y="159">100 Mbps, Cost = 1</text>
+                                        <!-- Link 5: Node 2 <-> Node 5 (Cost = 400) -->
+                                        <a href="#toggle-edge-5" id="edge-5" class="edge" data-id="5" data-u="2" data-v="5" data-cost="400">
+                                            <line class="edge-hit" x1="75" y1="195" x2="355" y2="195" />
+                                            <line class="edge-line" x1="75" y1="195" x2="355" y2="195" />
+                                            <rect class="edge-badge" x="187" y="184" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="215" y="199">400</text>
                                         </a>
-                                        <!-- Link 6: R3 <-> R5 (25 Mbps, Cost = 4) -->
-                                        <a href="#toggle-edge-6" id="edge-6" class="edge" data-id="6" data-u="3" data-v="5" data-bw="25" data-cost="4">
-                                            <line class="edge-hit" x1="415" y1="230" x2="600" y2="365" />
-                                            <line class="edge-line" x1="415" y1="230" x2="600" y2="365" />
-                                            <rect class="edge-badge" x="448.5" y="285.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="507.5" y="301.5">25 Mbps, Cost = 4</text>
+                                        <!-- Link 6: Node 3 <-> Node 9 (Cost = 800) -->
+                                        <a href="#toggle-edge-6" id="edge-6" class="edge" data-id="6" data-u="3" data-v="9" data-cost="800">
+                                            <line class="edge-hit" x1="250" y1="65" x2="515" y2="65" />
+                                            <line class="edge-line" x1="250" y1="65" x2="515" y2="65" />
+                                            <rect class="edge-badge" x="354.5" y="54" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="382.5" y="69">800</text>
                                         </a>
-                                        <!-- Link 7: R4 <-> R6 (100 Mbps, Cost = 1) -->
-                                        <a href="#toggle-edge-7" id="edge-7" class="edge is-path" data-id="7" data-u="4" data-v="6" data-bw="100" data-cost="1">
-                                            <line class="edge-hit" x1="600" y1="80" x2="785" y2="80" />
-                                            <line class="edge-line" x1="600" y1="80" x2="785" y2="80" />
-                                            <rect class="edge-badge" x="633.5" y="68" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="692.5" y="84">100 Mbps, Cost = 1</text>
+                                        <!-- Link 7: Node 4 <-> Node 5 (Cost = 100) -->
+                                        <a href="#toggle-edge-7" id="edge-7" class="edge is-path" data-id="7" data-u="4" data-v="5" data-cost="100">
+                                            <line class="edge-hit" x1="260" y1="335" x2="355" y2="195" />
+                                            <line class="edge-line" x1="260" y1="335" x2="355" y2="195" />
+                                            <rect class="edge-badge" x="279.5" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="307.5" y="269">100</text>
                                         </a>
-                                        <!-- Link 8: R5 <-> R6 (25 Mbps, Cost = 4) -->
-                                        <a href="#toggle-edge-8" id="edge-8" class="edge" data-id="8" data-u="5" data-v="6" data-bw="25" data-cost="4">
-                                            <line class="edge-hit" x1="600" y1="365" x2="785" y2="80" />
-                                            <line class="edge-line" x1="600" y1="365" x2="785" y2="80" />
-                                            <rect class="edge-badge" x="633.5" y="210.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="692.5" y="226.5">25 Mbps, Cost = 4</text>
+                                        <!-- Link 8: Node 4 <-> Node 6 (Cost = 400) -->
+                                        <a href="#toggle-edge-8" id="edge-8" class="edge" data-id="8" data-u="4" data-v="6" data-cost="400">
+                                            <line class="edge-hit" x1="260" y1="335" x2="515" y2="335" />
+                                            <line class="edge-line" x1="260" y1="335" x2="515" y2="335" />
+                                            <rect class="edge-badge" x="359.5" y="324" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="387.5" y="339">400</text>
                                         </a>
-                                        <!-- Link 9: R5 <-> R7 (50 Mbps, Cost = 2) -->
-                                        <a href="#toggle-edge-9" id="edge-9" class="edge" data-id="9" data-u="5" data-v="7" data-bw="50" data-cost="2">
-                                            <line class="edge-hit" x1="600" y1="365" x2="785" y2="365" />
-                                            <line class="edge-line" x1="600" y1="365" x2="785" y2="365" />
-                                            <rect class="edge-badge" x="633.5" y="353" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="692.5" y="369">50 Mbps, Cost = 2</text>
+                                        <!-- Link 9: Node 5 <-> Node 6 (Cost = 300) -->
+                                        <a href="#toggle-edge-9" id="edge-9" class="edge" data-id="9" data-u="5" data-v="6" data-cost="300">
+                                            <line class="edge-hit" x1="355" y1="195" x2="515" y2="335" />
+                                            <line class="edge-line" x1="355" y1="195" x2="515" y2="335" />
+                                            <rect class="edge-badge" x="407" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="435" y="269">300</text>
                                         </a>
-                                        <!-- Link 10: R6 <-> R8 (50 Mbps, Cost = 2) -->
-                                        <a href="#toggle-edge-10" id="edge-10" class="edge is-path" data-id="10" data-u="6" data-v="8" data-bw="50" data-cost="2">
-                                            <line class="edge-hit" x1="785" y1="80" x2="975" y2="80" />
-                                            <line class="edge-line" x1="785" y1="80" x2="975" y2="80" />
-                                            <rect class="edge-badge" x="821" y="68" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="880" y="84">50 Mbps, Cost = 2</text>
+                                        <!-- Link 10: Node 5 <-> Node 8 (Cost = 200) -->
+                                        <a href="#toggle-edge-10" id="edge-10" class="edge is-path" data-id="10" data-u="5" data-v="8" data-cost="200">
+                                            <line class="edge-hit" x1="355" y1="195" x2="680" y2="195" />
+                                            <line class="edge-line" x1="355" y1="195" x2="680" y2="195" />
+                                            <rect class="edge-badge" x="489.5" y="184" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="517.5" y="199">200</text>
                                         </a>
-                                        <!-- Link 11: R7 <-> R8 (25 Mbps, Cost = 4) -->
-                                        <a href="#toggle-edge-11" id="edge-11" class="edge" data-id="11" data-u="7" data-v="8" data-bw="25" data-cost="4">
-                                            <line class="edge-hit" x1="785" y1="365" x2="975" y2="80" />
-                                            <line class="edge-line" x1="785" y1="365" x2="975" y2="80" />
-                                            <rect class="edge-badge" x="821" y="210.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="880" y="226.5">25 Mbps, Cost = 4</text>
+                                        <!-- Link 11: Node 5 <-> Node 9 (Cost = 500) -->
+                                        <a href="#toggle-edge-11" id="edge-11" class="edge" data-id="11" data-u="5" data-v="9" data-cost="500">
+                                            <line class="edge-hit" x1="355" y1="195" x2="515" y2="65" />
+                                            <line class="edge-line" x1="355" y1="195" x2="515" y2="65" />
+                                            <rect class="edge-badge" x="407" y="119" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="435" y="134">500</text>
                                         </a>
-                                        <!-- Link 12: R7 <-> R9 (20 Mbps, Cost = 5) -->
-                                        <a href="#toggle-edge-12" id="edge-12" class="edge" data-id="12" data-u="7" data-v="9" data-bw="20" data-cost="5">
-                                            <line class="edge-hit" x1="785" y1="365" x2="975" y2="365" />
-                                            <line class="edge-line" x1="785" y1="365" x2="975" y2="365" />
-                                            <rect class="edge-badge" x="821" y="353" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="880" y="369">20 Mbps, Cost = 5</text>
+                                        <!-- Link 12: Node 6 <-> Node 7 (Cost = 200) -->
+                                        <a href="#toggle-edge-12" id="edge-12" class="edge" data-id="12" data-u="6" data-v="7" data-cost="200">
+                                            <line class="edge-hit" x1="515" y1="335" x2="680" y2="465" />
+                                            <line class="edge-line" x1="515" y1="335" x2="680" y2="465" />
+                                            <rect class="edge-badge" x="569.5" y="389" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="597.5" y="404">200</text>
                                         </a>
-                                        <!-- Link 13: R8 <-> R9 (100 Mbps, Cost = 1) -->
-                                        <a href="#toggle-edge-13" id="edge-13" class="edge is-path" data-id="13" data-u="8" data-v="9" data-bw="100" data-cost="1">
-                                            <line class="edge-hit" x1="975" y1="80" x2="975" y2="365" />
-                                            <line class="edge-line" x1="975" y1="80" x2="975" y2="365" />
-                                            <rect class="edge-badge" x="916" y="250.5" width="118" height="24" rx="6" />
-                                            <text class="edge-label" x="975" y="266.5">100 Mbps, Cost = 1</text>
+                                        <!-- Link 13: Node 6 <-> Node 8 (Cost = 200) -->
+                                        <a href="#toggle-edge-13" id="edge-13" class="edge" data-id="13" data-u="6" data-v="8" data-cost="200">
+                                            <line class="edge-hit" x1="515" y1="335" x2="680" y2="195" />
+                                            <line class="edge-line" x1="515" y1="335" x2="680" y2="195" />
+                                            <rect class="edge-badge" x="569.5" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="597.5" y="269">200</text>
+                                        </a>
+                                        <!-- Link 14: Node 7 <-> Node 11 (Cost = 300) -->
+                                        <a href="#toggle-edge-14" id="edge-14" class="edge" data-id="14" data-u="7" data-v="11" data-cost="300">
+                                            <line class="edge-hit" x1="680" y1="465" x2="780" y2="335" />
+                                            <line class="edge-line" x1="680" y1="465" x2="780" y2="335" />
+                                            <rect class="edge-badge" x="702" y="389" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="730" y="404">300</text>
+                                        </a>
+                                        <!-- Link 15: Node 7 <-> Node 13 (Cost = 600) -->
+                                        <a href="#toggle-edge-15" id="edge-15" class="edge" data-id="15" data-u="7" data-v="13" data-cost="600">
+                                            <line class="edge-hit" x1="680" y1="465" x2="960" y2="335" />
+                                            <line class="edge-line" x1="680" y1="465" x2="960" y2="335" />
+                                            <rect class="edge-badge" x="792" y="389" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="820" y="404">600</text>
+                                        </a>
+                                        <!-- Link 16: Node 8 <-> Node 9 (Cost = 300) -->
+                                        <a href="#toggle-edge-16" id="edge-16" class="edge" data-id="16" data-u="8" data-v="9" data-cost="300">
+                                            <line class="edge-hit" x1="680" y1="195" x2="515" y2="65" />
+                                            <line class="edge-line" x1="680" y1="195" x2="515" y2="65" />
+                                            <rect class="edge-badge" x="569.5" y="119" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="597.5" y="134">300</text>
+                                        </a>
+                                        <!-- Link 17: Node 8 <-> Node 11 (Cost = 200) -->
+                                        <a href="#toggle-edge-17" id="edge-17" class="edge is-path" data-id="17" data-u="8" data-v="11" data-cost="200">
+                                            <line class="edge-hit" x1="680" y1="195" x2="780" y2="335" />
+                                            <line class="edge-line" x1="680" y1="195" x2="780" y2="335" />
+                                            <rect class="edge-badge" x="702" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="730" y="269">200</text>
+                                        </a>
+                                        <!-- Link 18: Node 8 <-> Node 12 (Cost = 500) -->
+                                        <a href="#toggle-edge-18" id="edge-18" class="edge" data-id="18" data-u="8" data-v="12" data-cost="500">
+                                            <line class="edge-hit" x1="680" y1="195" x2="960" y2="195" />
+                                            <line class="edge-line" x1="680" y1="195" x2="960" y2="195" />
+                                            <rect class="edge-badge" x="792" y="184" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="820" y="199">500</text>
+                                        </a>
+                                        <!-- Link 19: Node 9 <-> Node 10 (Cost = 600) -->
+                                        <a href="#toggle-edge-19" id="edge-19" class="edge" data-id="19" data-u="9" data-v="10" data-cost="600">
+                                            <line class="edge-hit" x1="515" y1="65" x2="780" y2="65" />
+                                            <line class="edge-line" x1="515" y1="65" x2="780" y2="65" />
+                                            <rect class="edge-badge" x="619.5" y="54" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="647.5" y="69">600</text>
+                                        </a>
+                                        <!-- Link 20: Node 10 <-> Node 12 (Cost = 300) -->
+                                        <a href="#toggle-edge-20" id="edge-20" class="edge" data-id="20" data-u="10" data-v="12" data-cost="300">
+                                            <line class="edge-hit" x1="780" y1="65" x2="960" y2="195" />
+                                            <line class="edge-line" x1="780" y1="65" x2="960" y2="195" />
+                                            <rect class="edge-badge" x="842" y="119" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="870" y="134">300</text>
+                                        </a>
+                                        <!-- Link 21: Node 11 <-> Node 12 (Cost = 300) -->
+                                        <a href="#toggle-edge-21" id="edge-21" class="edge" data-id="21" data-u="11" data-v="12" data-cost="300">
+                                            <line class="edge-hit" x1="780" y1="335" x2="960" y2="195" />
+                                            <line class="edge-line" x1="780" y1="335" x2="960" y2="195" />
+                                            <rect class="edge-badge" x="842" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="870" y="269">300</text>
+                                        </a>
+                                        <!-- Link 22: Node 11 <-> Node 13 (Cost = 300) -->
+                                        <a href="#toggle-edge-22" id="edge-22" class="edge is-path" data-id="22" data-u="11" data-v="13" data-cost="300">
+                                            <line class="edge-hit" x1="780" y1="335" x2="960" y2="335" />
+                                            <line class="edge-line" x1="780" y1="335" x2="960" y2="335" />
+                                            <rect class="edge-badge" x="842" y="324" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="870" y="339">300</text>
+                                        </a>
+                                        <!-- Link 23: Node 12 <-> Node 13 (Cost = 200) -->
+                                        <a href="#toggle-edge-23" id="edge-23" class="edge" data-id="23" data-u="12" data-v="13" data-cost="200">
+                                            <line class="edge-hit" x1="960" y1="195" x2="960" y2="335" />
+                                            <line class="edge-line" x1="960" y1="195" x2="960" y2="335" />
+                                            <rect class="edge-badge" x="932" y="254" width="56" height="22" rx="6" />
+                                            <text class="edge-label" x="960" y="269">200</text>
                                         </a>
                                     </g>
                                 
-                                    <!-- LAYER 2: DAFTAR 10 ROUTER (NODES R0 - R9) -->
+                                    <!-- LAYER 2: DAFTAR 13 NODE (1 - 13) -->
                                     <g id="nodes-layer">
-                                        <!-- Router R0 -->
-                                        <a href="#toggle-node-0" id="node-0" class="node is-path is-source" data-id="0" data-label="R0">
-                                            <circle class="node-circle" cx="65" cy="230" r="28" />
-                                            <text class="node-name" x="65" y="235">R0</text>
-                                            <text class="node-cost" id="cost-0" x="65" y="276">ASAL • Cost: 0</text>
+                                        <!-- Node 1 -->
+                                        <a href="#toggle-node-1" id="node-1" class="node is-path is-source" data-id="1" data-label="1">
+                                            <circle class="node-circle" cx="170" cy="465" r="25" />
+                                            <text class="node-name" x="170" y="470">1</text>
+                                            <text class="node-cost" id="cost-1" x="170" y="509">ASAL • Cost: 0</text>
                                         </a>
-                                        <!-- Router R1 -->
-                                        <a href="#toggle-node-1" id="node-1" class="node is-path" data-id="1" data-label="R1">
-                                            <circle class="node-circle" cx="225" cy="75" r="28" />
-                                            <text class="node-name" x="225" y="80">R1</text>
-                                            <text class="node-cost" id="cost-1" x="225" y="35">Cost: 6</text>
+                                        <!-- Node 2 -->
+                                        <a href="#toggle-node-2" id="node-2" class="node" data-id="2" data-label="2">
+                                            <circle class="node-circle" cx="75" cy="195" r="25" />
+                                            <text class="node-name" x="75" y="200">2</text>
+                                            <text class="node-cost" id="cost-2" x="75" y="159">Cost: 700</text>
                                         </a>
-                                        <!-- Router R2 -->
-                                        <a href="#toggle-node-2" id="node-2" class="node is-path" data-id="2" data-label="R2">
-                                            <circle class="node-circle" cx="225" cy="365" r="28" />
-                                            <text class="node-name" x="225" y="370">R2</text>
-                                            <text class="node-cost" id="cost-2" x="225" y="411">Cost: 2</text>
+                                        <!-- Node 3 -->
+                                        <a href="#toggle-node-3" id="node-3" class="node" data-id="3" data-label="3">
+                                            <circle class="node-circle" cx="250" cy="65" r="25" />
+                                            <text class="node-name" x="250" y="70">3</text>
+                                            <text class="node-cost" id="cost-3" x="250" y="29">Cost: 1000</text>
                                         </a>
-                                        <!-- Router R3 -->
-                                        <a href="#toggle-node-3" id="node-3" class="node is-path" data-id="3" data-label="R3">
-                                            <circle class="node-circle" cx="415" cy="230" r="28" />
-                                            <text class="node-name" x="415" y="235">R3</text>
-                                            <text class="node-cost" id="cost-3" x="415" y="276">Cost: 8</text>
+                                        <!-- Node 4 -->
+                                        <a href="#toggle-node-4" id="node-4" class="node is-path" data-id="4" data-label="4">
+                                            <circle class="node-circle" cx="260" cy="335" r="25" />
+                                            <text class="node-name" x="260" y="340">4</text>
+                                            <text class="node-cost" id="cost-4" x="260" y="379">Cost: 400</text>
                                         </a>
-                                        <!-- Router R4 -->
-                                        <a href="#toggle-node-4" id="node-4" class="node is-path" data-id="4" data-label="R4">
-                                            <circle class="node-circle" cx="600" cy="80" r="28" />
-                                            <text class="node-name" x="600" y="85">R4</text>
-                                            <text class="node-cost" id="cost-4" x="600" y="40">Cost: 9</text>
+                                        <!-- Node 5 -->
+                                        <a href="#toggle-node-5" id="node-5" class="node is-path" data-id="5" data-label="5">
+                                            <circle class="node-circle" cx="355" cy="195" r="25" />
+                                            <text class="node-name" x="355" y="200">5</text>
+                                            <text class="node-cost" id="cost-5" x="355" y="159">Cost: 500</text>
                                         </a>
-                                        <!-- Router R5 -->
-                                        <a href="#toggle-node-5" id="node-5" class="node" data-id="5" data-label="R5">
-                                            <circle class="node-circle" cx="600" cy="365" r="28" />
-                                            <text class="node-name" x="600" y="370">R5</text>
-                                            <text class="node-cost" id="cost-5" x="600" y="411">Cost: 12</text>
+                                        <!-- Node 6 -->
+                                        <a href="#toggle-node-6" id="node-6" class="node" data-id="6" data-label="6">
+                                            <circle class="node-circle" cx="515" cy="335" r="25" />
+                                            <text class="node-name" x="515" y="340">6</text>
+                                            <text class="node-cost" id="cost-6" x="515" y="379">Cost: 800</text>
                                         </a>
-                                        <!-- Router R6 -->
-                                        <a href="#toggle-node-6" id="node-6" class="node is-path" data-id="6" data-label="R6">
-                                            <circle class="node-circle" cx="785" cy="80" r="28" />
-                                            <text class="node-name" x="785" y="85">R6</text>
-                                            <text class="node-cost" id="cost-6" x="785" y="40">Cost: 10</text>
+                                        <!-- Node 7 -->
+                                        <a href="#toggle-node-7" id="node-7" class="node" data-id="7" data-label="7">
+                                            <circle class="node-circle" cx="680" cy="465" r="25" />
+                                            <text class="node-name" x="680" y="470">7</text>
+                                            <text class="node-cost" id="cost-7" x="680" y="509">Cost: 900</text>
                                         </a>
-                                        <!-- Router R7 -->
-                                        <a href="#toggle-node-7" id="node-7" class="node" data-id="7" data-label="R7">
-                                            <circle class="node-circle" cx="785" cy="365" r="28" />
-                                            <text class="node-name" x="785" y="370">R7</text>
-                                            <text class="node-cost" id="cost-7" x="785" y="411">Cost: 14</text>
+                                        <!-- Node 8 -->
+                                        <a href="#toggle-node-8" id="node-8" class="node is-path" data-id="8" data-label="8">
+                                            <circle class="node-circle" cx="680" cy="195" r="25" />
+                                            <text class="node-name" x="680" y="200">8</text>
+                                            <text class="node-cost" id="cost-8" x="680" y="159">Cost: 700</text>
                                         </a>
-                                        <!-- Router R8 -->
-                                        <a href="#toggle-node-8" id="node-8" class="node is-path" data-id="8" data-label="R8">
-                                            <circle class="node-circle" cx="975" cy="80" r="28" />
-                                            <text class="node-name" x="975" y="85">R8</text>
-                                            <text class="node-cost" id="cost-8" x="975" y="40">Cost: 12</text>
+                                        <!-- Node 9 -->
+                                        <a href="#toggle-node-9" id="node-9" class="node" data-id="9" data-label="9">
+                                            <circle class="node-circle" cx="515" cy="65" r="25" />
+                                            <text class="node-name" x="515" y="70">9</text>
+                                            <text class="node-cost" id="cost-9" x="515" y="29">Cost: 1000</text>
                                         </a>
-                                        <!-- Router R9 -->
-                                        <a href="#toggle-node-9" id="node-9" class="node is-path is-dest" data-id="9" data-label="R9">
-                                            <circle class="node-circle" cx="975" cy="365" r="28" />
-                                            <text class="node-name" x="975" y="370">R9</text>
-                                            <text class="node-cost" id="cost-9" x="975" y="411">TUJUAN • Cost: 13</text>
+                                        <!-- Node 10 -->
+                                        <a href="#toggle-node-10" id="node-10" class="node" data-id="10" data-label="10">
+                                            <circle class="node-circle" cx="780" cy="65" r="25" />
+                                            <text class="node-name" x="780" y="70">10</text>
+                                            <text class="node-cost" id="cost-10" x="780" y="29">Cost: 1500</text>
+                                        </a>
+                                        <!-- Node 11 -->
+                                        <a href="#toggle-node-11" id="node-11" class="node is-path" data-id="11" data-label="11">
+                                            <circle class="node-circle" cx="780" cy="335" r="25" />
+                                            <text class="node-name" x="780" y="340">11</text>
+                                            <text class="node-cost" id="cost-11" x="780" y="379">Cost: 900</text>
+                                        </a>
+                                        <!-- Node 12 -->
+                                        <a href="#toggle-node-12" id="node-12" class="node" data-id="12" data-label="12">
+                                            <circle class="node-circle" cx="960" cy="195" r="25" />
+                                            <text class="node-name" x="960" y="200">12</text>
+                                            <text class="node-cost" id="cost-12" x="960" y="159">Cost: 1200</text>
+                                        </a>
+                                        <!-- Node 13 -->
+                                        <a href="#toggle-node-13" id="node-13" class="node is-path is-dest" data-id="13" data-label="13">
+                                            <circle class="node-circle" cx="960" cy="335" r="25" />
+                                            <text class="node-name" x="960" y="340">13</text>
+                                            <text class="node-cost" id="cost-13" x="960" y="379">TUJUAN • Cost: 1200</text>
                                         </a>
                                     </g>
                                 </svg>
