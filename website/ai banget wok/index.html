@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulator Visualisasi: Dijkstra vs Dijkstra Optimal (13 Node OSPF)</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- HEADER UTAMA -->
+  <header class="border-b border-slate-800 bg-slate-900/95 sticky top-0 z-30 backdrop-blur">
+    <div class="max-w-[1440px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-sky-500/30 border border-emerald-400/40 flex items-center justify-center text-emerald-300 font-extrabold text-sm mono shadow">
+          OSPF
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-bold text-white flex flex-wrap items-center gap-2">
+            Simulator Visualisasi: Dijkstra vs Dijkstra Optimal
+            <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              Topologi 13 Node &amp; 24 Jalur OSPF
+            </span>
+          </h1>
+          <p class="text-xs text-slate-400">
+            Membandingkan Pseudocode <strong class="text-amber-300">Dijkstra (getRouterIndex Lambda O(n))</strong> vs <strong class="text-emerald-300">Dijkstra Optimal (Hash Map O(1))</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- TOMBOL PEMBEDA UTAMA: DIJKSTRA VS DIJKSTRA OPTIMAL -->
+      <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-700">
+        <button id="btnModeStandard" type="button" class="px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow">
+          <span>🐢 Dijkstra</span>
+          <span class="mono text-[11px] px-1.5 py-0.5 rounded bg-slate-950/25">getRouterIndex O(V·E)</span>
+        </button>
+        <button id="btnModeMinHeap" type="button" class="px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
+          <span>⚡ Dijkstra Optimal</span>
+          <span class="mono text-[11px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Hash Map O((V+E)logV)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-[1440px] w-full mx-auto px-4 py-4 space-y-4">
+
+    <!-- BARIS 1: KONTROL RUTE & SCOREBOARD PERBANDINGAN OPERASI REAL-TIME -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-3">
+      <!-- Pilih Node Awal, Akhir & Skenario -->
+      <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between gap-3">
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+          <div class="flex-1">
+            <label for="selectSource" class="block text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1">
+              Router Asal (srcId)
+            </label>
+            <select id="selectSource" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-emerald-500">
+              <option value="1" selected>Node 1</option>
+              <option value="2">Node 2</option>
+              <option value="3">Node 3</option>
+              <option value="4">Node 4</option>
+              <option value="5">Node 5</option>
+              <option value="6">Node 6</option>
+              <option value="7">Node 7</option>
+              <option value="8">Node 8</option>
+              <option value="9">Node 9</option>
+              <option value="10">Node 10</option>
+              <option value="11">Node 11</option>
+              <option value="12">Node 12</option>
+              <option value="13">Node 13</option>
+            </select>
+          </div>
+
+          <button id="btnSwapNodes" type="button" title="Tukar Node Awal &amp; Tujuan" class="mt-5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition">
+            ⇄
+          </button>
+
+          <div class="flex-1">
+            <label for="selectDest" class="block text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-1">
+              Router Tujuan (destId)
+            </label>
+            <select id="selectDest" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-amber-500">
+              <option value="1">Node 1</option>
+              <option value="2">Node 2</option>
+              <option value="3">Node 3</option>
+              <option value="4">Node 4</option>
+              <option value="5">Node 5</option>
+              <option value="6">Node 6</option>
+              <option value="7">Node 7</option>
+              <option value="8">Node 8</option>
+              <option value="9">Node 9</option>
+              <option value="10">Node 10</option>
+              <option value="11">Node 11</option>
+              <option value="12">Node 12</option>
+              <option value="13" selected>Node 13</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-800/80 text-[11px]">
+          <span class="text-slate-400 font-semibold">Uji Matikan Jalur/Node:</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button id="btnPresetNormal" type="button" class="px-2.5 py-1 rounded-lg font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition">
+              ✓ Semua Aktif
+            </button>
+            <button id="btnPresetCut58" type="button" class="px-2.5 py-1 rounded-lg font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition">
+              ⚡ Putus Jalur 5–8
+            </button>
+            <button id="btnPresetDown8" type="button" class="px-2.5 py-1 rounded-lg font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition">
+              ✕ Matikan Node 8
+            </button>
+            <button id="btnPresetDown56" type="button" class="px-2.5 py-1 rounded-lg font-semibold bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 transition">
+              ⚠ Matikan Node 5 &amp; 6
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Head-to-Head Scoreboard: Dijkstra vs Dijkstra Optimal -->
+      <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+        <!-- Kartu Dijkstra (Baseline) -->
+        <div id="cardScoreStandard" class="p-3 rounded-xl bg-amber-950/25 border-2 border-amber-500/60 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase text-amber-300">🐢 Dijkstra (Baseline)</span>
+            <span class="mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">O(V · E)</span>
+          </div>
+          <div class="mt-1.5 flex items-baseline justify-between">
+            <span class="text-xs text-slate-400">Total T_Baseline:</span>
+            <span id="scoreStdTotal" class="text-lg font-extrabold text-amber-300 mono">0 op</span>
+          </div>
+          <div class="mt-1 text-[11px] text-slate-400 mono space-y-0.5">
+            <div class="flex justify-between"><span>getRouterIndex O(n):</span><span id="scoreStdScan" class="text-rose-300 font-bold">0</span></div>
+            <div class="flex justify-between"><span>Heap PQ &amp; Relaksasi:</span><span id="scoreStdEdge" class="text-slate-200">0</span></div>
+          </div>
+        </div>
+
+        <!-- Kartu Dijkstra Optimal -->
+        <div id="cardScoreHeap" class="p-3 rounded-xl bg-slate-950 border border-slate-800 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase text-emerald-300">⚡ Dijkstra Optimal</span>
+            <span class="mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">O((V+E)logV)</span>
+          </div>
+          <div class="mt-1.5 flex items-baseline justify-between">
+            <span class="text-xs text-slate-400">Total T_Optimal:</span>
+            <span id="scoreHeapTotal" class="text-lg font-extrabold text-emerald-300 mono">0 op</span>
+          </div>
+          <div class="mt-1 text-[11px] text-slate-400 mono space-y-0.5">
+            <div class="flex justify-between"><span>HashMap Init &amp; get O(1):</span><span id="scoreHeapOps" class="text-emerald-300 font-bold">0</span></div>
+            <div class="flex justify-between"><span>Heap PQ &amp; Relaksasi:</span><span id="scoreHeapEdge" class="text-slate-200">0</span></div>
+          </div>
+        </div>
+
+        <!-- Ringkasan Rute & Penghematan -->
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between h-full">
+          <div>
+            <div class="flex items-center justify-between gap-1">
+              <span id="badgeRouteStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                RUTE OPTIMAL
+              </span>
+              <span id="badgeEfficiency" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 mono">
+                Hemat 65% op
+              </span>
+            </div>
+            <div id="textFinalRoute" class="mt-2 text-xs sm:text-sm font-extrabold text-white mono break-words">
+              1 → 4 → 5 → 8 → 11 → 13
+            </div>
+          </div>
+          <div class="mt-2 pt-1.5 border-t border-slate-800 flex items-center justify-between text-xs">
+            <span class="text-slate-400">Total OSPF Cost:</span>
+            <span id="textFinalCost" class="font-extrabold text-emerald-400 mono text-sm">11</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARIS 2: KANVAS TOPOLOGI INTERAKTIF (KIRI) & LIVE PSEUDOCODE EXECUTION DEBUGGER (KANAN) -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+      <!-- KIRI (7 KOLOM): DIAGRAM TOPOLOGI 13 NODE + KONTROL ANIMASI YOUTUBE STYLE -->
+      <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-lg">
+        <!-- Header Kanvas & Legenda Warna Animasi -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div>
+            <h2 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <span>Peta Topologi Jaringan (13 Node, 24 Jalur)</span>
+              <span id="activeModeTagOnMap" class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Mode: Dijkstra (Baseline)
+              </span>
+            </h2>
+          </div>
+          <!-- Legenda Warna Animasi -->
+          <div class="flex flex-wrap items-center gap-2.5 text-[11px] bg-slate-950 px-3 py-1 rounded-xl border border-slate-800">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block"></span> Lookup vIdx / Cek Sisi</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Node uNode Aktif</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Relaksasi / Jalur Terbaik</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Broken / Down (OFF)</span>
+          </div>
+        </div>
+
+        <!-- SVG TOPOLOGI 13 NODE -->
+        <div class="relative w-full bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+          <svg id="topologySvg" viewBox="0 0 1220 560" class="w-full h-auto block select-none">
+            <defs>
+              <pattern id="ospfGrid" width="35" height="35" patternUnits="userSpaceOnUse">
+                <path d="M 35 0 L 0 0 0 35" fill="none" stroke="#111827" stroke-width="0.9" />
+              </pattern>
+            </defs>
+            <rect width="1220" height="560" fill="url(#ospfGrid)" />
+            <g id="edgesLayer"></g>
+            <g id="nodesLayer"></g>
+          </svg>
+        </div>
+
+        <!-- KOTAK NARASI LANGKAH (ALA SUBTITLE VIDEO TUTORIAL YOUTUBE) -->
+        <div class="mt-3 bg-slate-950 border border-slate-800 rounded-xl p-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <div class="flex items-center gap-2">
+              <span id="stepPhaseBadge" class="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mono">
+                SIAP SIMULASI
+              </span>
+              <span id="stepCounterLabel" class="text-xs font-bold text-slate-300 mono">
+                Langkah 0 / 0
+              </span>
+            </div>
+            <span id="stepCostFormula" class="text-xs font-bold text-emerald-300 mono">
+              Klik "▶ Play Animasi" atau "Next ▶" untuk melihat eksekusi pseudocode
+            </span>
+          </div>
+          <p id="stepNarrationText" class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+            Pilih tombol <strong>🐢 Dijkstra</strong> atau <strong>⚡ Dijkstra Optimal</strong> di kanan atas, lalu tekan <strong>▶ Play Animasi</strong> untuk melihat perbedaan antara pencarian indeks <code>getRouterIndex(id)</code> $O(n)$ dan <code>routerIndexMap.get(id)</code> $O(1)$.
+          </p>
+        </div>
+
+        <!-- PLAYER BAR ANIMASI + SCRUBBER TIMELINE + KECEPATAN -->
+        <div class="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2.5">
+          <!-- Scrubber Bar -->
+          <div class="flex items-center gap-3">
+            <span class="text-[11px] text-slate-400 mono w-14">Timeline</span>
+            <input id="stepSlider" type="range" min="0" max="10" value="10" class="flex-1 accent-emerald-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button id="btnStepStart" type="button" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                ⏮ Awal
+              </button>
+              <button id="btnStepPrev" type="button" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                ◀ Prev
+              </button>
+              <button id="btnPlayPause" type="button" class="px-4 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow transition">
+                ▶ Play Animasi
+              </button>
+              <button id="btnStepNext" type="button" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                Next ▶
+              </button>
+              <button id="btnStepEnd" type="button" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 transition">
+                ⏭ Hasil Akhir
+              </button>
+            </div>
+
+            <!-- Pilihan Kecepatan -->
+            <div class="flex items-center gap-2 text-xs">
+              <label for="selectSpeed" class="text-slate-400 font-semibold">Kecepatan:</label>
+              <select id="selectSpeed" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold text-white">
+                <option value="1300">0.5x (Lambat &amp; Detail)</option>
+                <option value="750" selected>1x (Normal Tutorial)</option>
+                <option value="380">2x (Cepat)</option>
+                <option value="160">4x (Kilat)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KANAN (5 KOLOM): PENUNJUK BARIS PSEUDOCODE AKTIF & VISUALISASI LOOKUP + MIN-HEAP -->
+      <div class="lg:col-span-5 flex flex-col gap-4">
+
+        <!-- PANEL 1: LIVE PSEUDOCODE DEBUGGER (MENUNJUKKAN BAGIAN PSEUDOCODE YANG SEDANG DIJALANKAN) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div>
+              <h3 id="codePanelTitle" class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+                💻 Pseudocode: Procedure Dijkstra_Baseline
+              </h3>
+              <p class="text-[11px] text-slate-400">
+                Baris yang menyala (<span class="mono text-amber-300">▶</span>) adalah bagian pseudocode yang sedang dijalankan
+              </p>
+            </div>
+            <span id="activeLineBadge" class="mono text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              Baris: Selesai
+            </span>
+          </div>
+
+          <!-- Live Variable Watch Bar (Nilai Variabel Saat Ini) -->
+          <div class="grid grid-cols-4 gap-1.5 mb-2.5 bg-slate-950 p-2 rounded-xl border border-slate-800 text-[11px] mono">
+            <div class="px-2 py-1 rounded bg-slate-900">
+              <span class="text-slate-400 block text-[10px]">uIdx (uNode)</span>
+              <span id="watchU" class="font-bold text-amber-300 text-xs">-</span>
+            </div>
+            <div class="px-2 py-1 rounded bg-slate-900">
+              <span class="text-slate-400 block text-[10px]">vIdx (vNode)</span>
+              <span id="watchV" class="font-bold text-sky-300 text-xs">-</span>
+            </div>
+            <div class="px-2 py-1 rounded bg-slate-900">
+              <span class="text-slate-400 block text-[10px]">Biaya Lookup vIdx</span>
+              <span id="watchCand" class="font-bold text-emerald-300 text-xs">-</span>
+            </div>
+            <div class="px-2 py-1 rounded bg-slate-900">
+              <span class="text-slate-400 block text-[10px]">Total Operasi</span>
+              <span id="watchOps" class="font-bold text-indigo-300 text-xs">0 op</span>
+            </div>
+          </div>
+
+          <!-- Blok Baris Pseudocode dengan Highlight Otomatis -->
+          <div id="codeLinesContainer" class="bg-slate-950 border border-slate-800 rounded-xl py-2 overflow-x-auto mono">
+            <!-- Diisi oleh JS sesuai mode Dijkstra atau Dijkstra Optimal -->
+          </div>
+        </div>
+
+        <!-- PANEL 2: VISUALISASI PERBEDAAN LOOKUP (getRouterIndex O(n) VS routerIndexMap O(1)) + MIN-HEAP PQ -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex-1 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div>
+              <h3 id="dsPanelTitle" class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+                🔍 Bottleneck: getRouterIndex(id) Scan O(n) + Min-Heap PQ
+              </h3>
+              <p id="dsPanelSubtitle" class="text-[11px] text-slate-400">
+                Setiap cek tetangga vNode, fungsi getRouterIndex harus memindai G.m_routers[0..n-1]
+              </p>
+            </div>
+            <span id="dsSizeBadge" class="mono text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+              PQ: 0 item
+            </span>
+          </div>
+
+          <!-- Kanvas Visualisasi Lookup & Min-Heap -->
+          <div id="dsVisualizerBox" class="bg-slate-950 border border-slate-800 rounded-xl p-3 min-h-[190px] flex flex-col items-center justify-between gap-2">
+            <!-- Diisi secara dinamis oleh JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- BARIS 3: TABEL STATUS JARAK dist[0..n-1] LIVE & SAKLAR CEPAT NODE/JALUR -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <!-- Tabel Jarak dist[] & parentNode[] -->
+      <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div>
+            <h3 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+              📊 Tabel Output Pseudocode: <span class="mono text-emerald-400">dist[0..12]</span> &amp; <span class="mono text-sky-400">parentNode[0..12]</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">
+              Menampilkan indeks vektor <span class="mono text-slate-200">idx (0..12)</span>, ID Router <span class="mono text-slate-200">getId() (1..13)</span>, nilai <span class="mono text-emerald-300">dist[]</span>, dan <span class="mono text-sky-300">parentNode[]</span>
+            </p>
+          </div>
+        </div>
+
+        <div id="distArrayGrid" class="grid grid-cols-4 sm:grid-cols-7 lg:grid-cols-13 gap-1.5">
+          <!-- 13 Kartu Node diisi oleh JS -->
+        </div>
+      </div>
+
+      <!-- Saklar Cepat Matikan/Nyalakan Node (uNode.isDown()) -->
+      <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+              🔌 Saklar Status Router (<span class="mono">isDown()</span>)
+            </h3>
+            <button id="btnResetAllOn" type="button" class="text-[11px] text-emerald-400 hover:underline font-semibold">
+              Nyalakan Semua
+            </button>
+          </div>
+          <div id="nodeToggleButtons" class="grid grid-cols-5 sm:grid-cols-7 gap-1.5">
+            <!-- Tombol Node 1..13 diisi oleh JS -->
+          </div>
+        </div>
+        <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-slate-400 leading-relaxed">
+          💡 <strong class="text-slate-200">Perhatikan Bedanya:</strong> Pada tombol <strong>🐢 Dijkstra</strong>, setiap cek sisi tetangga memicu <code>getRouterIndex</code> ($O(n)$). Pada <strong>⚡ Dijkstra Optimal</strong>, lookup <code>routerIndexMap.get()</code> langsung instan $O(1)$!
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
